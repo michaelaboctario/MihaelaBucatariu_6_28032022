@@ -4,7 +4,10 @@ const mongoose = require('mongoose');
 // mongoose models
 const User = require('./models/user');
 const authRoutes = require('./routes/user');
+// path package for working with file paths
+const path = require("path");
 
+// express application
 const app = express();
 app.use(express.json());
 
@@ -24,6 +27,9 @@ mongoose.connect(mongo_uri,
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
+
+  // path for images folder
+  app.use("/images", express.static(path.join(__dirname, "images")));
 
   // use routes
   app.use('/api/auth', authRoutes);
