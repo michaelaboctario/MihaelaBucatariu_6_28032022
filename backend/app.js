@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-// mongoose models
-const User = require('./models/user');
+// routes
 const authRoutes = require('./routes/user');
+const sauceRoutes = require('./routes/sauce');
 // path package for working with file paths
 const path = require("path");
 
@@ -33,4 +33,5 @@ mongoose.connect(mongo_uri,
 
   // use routes
   app.use('/api/auth', authRoutes);
+  app.use('/api/sauces', sauceRoutes);
   module.exports = app;
