@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+// mongoose models
+const User = require('./models/user');
+const authRoutes = require('./routes/user');
+
 const app = express();
 app.use(express.json());
 
@@ -21,4 +25,6 @@ mongoose.connect(mongo_uri,
     next();
   });
 
+  // use routes
+  app.use('/api/auth', authRoutes);
   module.exports = app;
