@@ -21,13 +21,11 @@ exports.sauceCreate = function (req, res, next) {
         userDisliked: [''],
     });
 
-    // sauce userId equal to userId from connexion token
-    // if (sauce.userId === req.auth.userId) {
-    if (true) {    
-        sauce
-        .save() 
-        .then((sauce) => res.status(201).json({ message: 'Sauce enregistrée!' }))
-        .catch((error) => res.status(400).json({ message: error.message }));
+    // if sauce userId equal to userId from connexion token
+    if (sauce.userId === req.auth.userId) {
+        sauce.save() 
+            .then((sauce) => res.status(201).json({ message: 'Sauce enregistrée!' }))
+            .catch((error) => res.status(400).json({ message: error.message }));
     } else {
         res.status(403).json({ message: 'Création non autorisée!' });
     }   
