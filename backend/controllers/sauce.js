@@ -33,10 +33,12 @@ const updateDislikesList = (sauce, userId) => {
 const revertLike = (sauce, userId) => { 
   const {usersLiked, usersDisliked} = sauce;
   if (usersLiked.includes(userId)) {
-    usersLiked.filter(user => user !== userId);
+    const indexUser = usersLiked.indexOf(userId);
+    usersLiked.splice(indexUser, 1);
   }
   else if (usersDisliked.includes(userId)) {
-    usersDisliked.filter(user => user !== userId);
+    const indexUser = usersDisliked.indexOf(userId);
+    usersDisliked.splice(indexUser, 1);
   }
 }
 
@@ -136,31 +138,35 @@ exports.likeSauce = (req, res, next) => {
     .then(sauce => {
       const likeAction = req.body.like;
       const {userId} = req.body;
+      try
+      {
+        switch (likeAction) {
+          case LIKE:
+            updateLikesList(sauce, userId);
+            break;
+  
+          case DISLIKE:
+            updateDislikesList(sauce, userId);
+            break;
+  
+          case REVERTLIKE:
+            revertLike(sauce, userId);         
+            break;
+  
+          default:
+            throw new Error('Action like invalide !');
+        }
+        //calcul du numero total de likes et dislikes
+        sauce.likes = sauce.usersLiked.length;
+        sauce.dislikes = sauce.usersDisliked.length;
 
-      switch (likeAction) {
-        case LIKE:
-          updateLikesList(sauce, userId);
-          break;
-
-        case DISLIKE:
-          updateDislikesList(sauce, userId);
-          break;
-
-        case REVERTLIKE:
-          revertLike(sauce, userId);         
-          break;
-
-        default:
-          throw new Error('Action like invalide !');
+        //mettre à jour la base de donées 
+        Sauce.updateOne({ _id: req.params.id }, sauce)
+          .then(sauce => res.status(200).json({ message: 'Sauce like/dislike mis à jour !' }))
+          .catch(error => res.status(400).json({ error: error.message }));
       }
-
-      //calcul du numero total de likes et dislikes
-      sauce.likes = sauce.usersLiked.length;
-      sauce.dislikes = sauce.usersDisliked.length;
-
-      //mettre à jour la base de donées 
-      Sauce.updateOne({ _id: req.params.id }, sauce)
-        .then((sauce) => res.status(200).json({ message: 'Sauce like/dislike mis à jour !' }))
-        .catch((error) => res.status(400).json({ error: error.message }));
-    })
+      catch (error) {
+        res.status(400).json({ error: error.message });
+      }
+    })      
 };
