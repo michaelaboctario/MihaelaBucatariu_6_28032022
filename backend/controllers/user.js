@@ -4,8 +4,6 @@ const jwt = require("jsonwebtoken");
 const User = require('../models/user');
 
 exports.signup = (req, res, next) => {
-    //console.log("exports.signup");
-    //console.log(req.body);
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
@@ -14,13 +12,12 @@ exports.signup = (req, res, next) => {
         });
         user.save()
           .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-          .catch(error => res.status(400).json({ message: error.message }));
+          .catch(error => res.status(400).json({ error: error.message }));
       })
-      .catch(error => res.status(500).json({  message: error.message }));
+      .catch(error => res.status(500).json({  error: error.message }));
   };
 
 exports.login = (req, res, next) => {
-  //console.log("exports.login");
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
@@ -40,7 +37,7 @@ exports.login = (req, res, next) => {
             ),
           });
         })
-        .catch(error => res.status(500).json({ message: error.message }));
+        .catch(error => res.status(500).json({ error: error.message }));
     })
 };
 
@@ -48,5 +45,5 @@ exports.users = (req, res, next) => {
   console.log("exports.users");
   User.find()
     .then(users => res.status(200).json(users))
-    .catch(error => res.status(400).json({ error }));
+    .catch(error => res.status(400).json({ error: error.message }));
 };
