@@ -1,7 +1,44 @@
 //Sauce
 const Sauce = require('../models/sauce');
 const fs = require('fs');
-const { Promise } = require('mongoose');
+
+const LIKE = 1;
+const DISLIKE = -1;
+const REVERTLIKE = 0;
+
+const updateLikesList = (sauce, userId) => { 
+  const {usersLiked, usersDisliked} = sauce;
+  if (usersDisliked.includes(userId)) {
+    throw new Error("Merci d'annuler votre dislike avant de liker !");
+  }
+  else if (usersLiked.includes(userId)) {
+    throw new Error("Un seul like possible !");
+  } else {
+    usersLiked.push(userId); 
+  }
+}
+
+const updateDislikesList = (sauce, userId) => { 
+  const {usersLiked, usersDisliked} = sauce;
+  if (usersLiked.includes(userId)) {
+    throw new Error("Merci d'annuler votre like avant de disliker !");
+  }
+  else if (usersDisliked.includes(userId)) {
+    throw new Error("Un seul dislike possible !");
+  } else {
+    usersDisliked.push(userId); 
+  }
+}
+
+const revertLike = (sauce, userId) => { 
+  const {usersLiked, usersDisliked} = sauce;
+  if (usersLiked.includes(userId)) {
+    usersLiked.filter(user => user !== userId);
+  }
+  else if (usersDisliked.includes(userId)) {
+    usersDisliked.filter(user => user !== userId);
+  }
+}
 
 // Handle create sauce on POST.
 exports.sauceCreate = function (req, res, next) {
@@ -100,4 +137,38 @@ exports.updateSauce = (req, res, next) => {
           .catch(error => res.status(400).json({error: error.message}));
       };   
   })
+};
+
+exports.likeSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id })
+    .then(sauce => {
+      const likeAction = req.body.like;
+      const {userId} = req.body;
+
+      switch (likeAction) {
+        case LIKE:
+          updateLikesList(sauce, userId);
+          break;
+
+        case DISLIKE:
+          updateDislikesList(sauce, userId);
+          break;
+
+        case REVERTLIKE:
+          revertLike(sauce, userId);         
+          break;
+
+        default:
+          throw new Error('Action like invalide !');
+      }
+
+      //calcul du numero total de likes et dislikes
+      sauce.likes = sauce.usersLiked.length;
+      sauce.dislikes = sauce.usersDisliked.length;
+
+      //mettre à jour la base de donées 
+      Sauce.updateOne({ _id: req.params.id }, sauce)
+        .then((sauce) => res.status(200).json({ message: "Sauce like/dislike mis à jour !" }))
+        .catch((error) => res.status(400).json({ error: error.message }));
+    })
 };
