@@ -43,7 +43,7 @@ const revertLike = (sauce, userId) => {
 }
 
 // Handle create sauce on POST.
-exports.sauceCreate = function (req, res, next) {
+exports.sauceCreate = function (req, res) {
     const sauceObject = JSON.parse(req.body.sauce);
     delete sauceObject._id;
     const sauce = new Sauce({
@@ -65,19 +65,19 @@ exports.sauceCreate = function (req, res, next) {
     }   
   };
 
-  exports.getAllSauces = (req, res, next) => {
+  exports.getAllSauces = (req, res) => {
     Sauce.find()
       .then((sauces) => res.status(200).json(sauces))
       .catch((error) => res.status(400).json({ error: error.message }));
   };
 
-  exports.getOneSauce = (req, res, next) => {
+  exports.getOneSauce = (req, res) => {
     Sauce.findOne({ _id: req.params.id })
       .then(sauce => res.status(200).json(sauce))
       .catch(error => res.status(404).json({ error: error.message }));
   };
 
-  exports.deleteSauce = (req, res, next) => {
+  exports.deleteSauce = (req, res) => {
       Sauce.findOne({ _id: req.params.id })
       .then(sauce => {
         if (!sauce) {
@@ -98,7 +98,7 @@ exports.sauceCreate = function (req, res, next) {
       .catch(error => res.status(400).json({ error: error.message }));
   };
   
-exports.updateSauce = (req, res, next) => {
+exports.updateSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id }).then(sauce => {
       if (!sauce) {
         return res.status(404).json({ error: 'Sauce non trouvée !' });
@@ -133,7 +133,7 @@ exports.updateSauce = (req, res, next) => {
   })
 };
 
-exports.likeSauce = (req, res, next) => {
+exports.likeSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
       const likeAction = req.body.like;

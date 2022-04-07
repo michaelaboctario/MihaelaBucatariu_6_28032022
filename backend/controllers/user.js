@@ -3,11 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require('../models/user');
 
-
-
-
-
-exports.signup = (req, res, next) => {
+exports.signup = (req, res) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new User({
@@ -21,7 +17,7 @@ exports.signup = (req, res, next) => {
       .catch(error => res.status(500).json({  error: error.message }));
   };
 
-exports.login = (req, res, next) => {
+exports.login = (req, res) => {
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
@@ -43,11 +39,4 @@ exports.login = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error: error.message }));
     })
-};
-
-exports.users = (req, res, next) => {
-  console.log("exports.users");
-  User.find()
-    .then(users => res.status(200).json(users))
-    .catch(error => res.status(400).json({ error: error.message }));
 };
