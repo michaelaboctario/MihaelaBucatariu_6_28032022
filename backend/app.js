@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 
 // routes
 const authRoutes = require('./routes/user');
@@ -42,6 +43,13 @@ mongoose.connect(mongo_uri,
   // Apply the rate limiting middleware to all requests
   app.use(limiter);
   
+  // replace $ and . characters (which are reserved for use by MongoDB as operators) with _  
+  app.use(
+    mongoSanitize({
+      replaceWith: '_',
+    }),
+  );
+
   // path for images folder
   app.use("/images", express.static(path.join(__dirname, "images")));
 
