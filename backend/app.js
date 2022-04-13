@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // routes
 const authRoutes = require('./routes/user');
@@ -31,6 +32,16 @@ mongoose.connect(mongo_uri,
     next();
   });
 
+  // Use to limit repeated requests to public APIs and/or endpoints such as password reset
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  })
+  // Apply the rate limiting middleware to all requests
+  app.use(limiter);
+  
   // path for images folder
   app.use("/images", express.static(path.join(__dirname, "images")));
 
