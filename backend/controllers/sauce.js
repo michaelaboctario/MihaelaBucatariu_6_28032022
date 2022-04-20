@@ -59,32 +59,32 @@ exports.sauceCreate = function (req, res) {
     if (sauce.userId === req.auth.userId) {
         sauce.save() 
             .then((sauce) => res.status(201).json({ message: 'Sauce enregistrée!' }))
-            .catch((error) => res.status(400).json({ error: error.message }));
+            .catch((error) => res.status(400).json({ message: error.message }));
     } else {
-        res.status(403).json({ error: 'Création non autorisée !' });
+        res.status(403).json({ message: 'Création non autorisée !' });
     }   
   };
 
   exports.getAllSauces = (req, res) => {
     Sauce.find()
       .then((sauces) => res.status(200).json(sauces))
-      .catch((error) => res.status(400).json({ error: error.message }));
+      .catch((error) => res.status(400).json({ message: error.message }));
   };
 
   exports.getOneSauce = (req, res) => {
     Sauce.findOne({ _id: req.params.id })
       .then(sauce => res.status(200).json(sauce))
-      .catch(error => res.status(404).json({ error: error.message }));
+      .catch(error => res.status(404).json({ message: error.message }));
   };
 
   exports.deleteSauce = (req, res) => {
       Sauce.findOne({ _id: req.params.id })
       .then(sauce => {
         if (!sauce) {
-          return res.status(404).json({ error: 'Sauce non trouvée !' });
+          return res.status(404).json({ message: 'Sauce non trouvée !' });
         }
         else if (sauce.userId && sauce.userId !== req.auth.userId) {
-          return res.status(403).json({ error: 'Requête non autorisée !' });
+          return res.status(403).json({ message: 'Requête non autorisée !' });
         }
         const filename = sauce.imageUrl.split('/images/')[1];
         fs.unlink(`images/${filename}`, () => {
@@ -92,19 +92,19 @@ exports.sauceCreate = function (req, res) {
             .then(sauce =>
               res.status(200).json({ message: 'Sauce supprimée !'})
             )
-            .catch(error => res.status(400).json({ error: error.message }));
+            .catch(error => res.status(400).json({ message: error.message }));
         });
       })
-      .catch(error => res.status(400).json({ error: error.message }));
+      .catch(error => res.status(400).json({ message: error.message }));
   };
   
 exports.updateSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id }).then(sauce => {
       if (!sauce) {
-        return res.status(404).json({ error: 'Sauce non trouvée !' });
+        return res.status(404).json({ message: 'Sauce non trouvée !' });
       }
       else if (req.body.userId && req.body.userId !== sauce.userId) {
-        res.status(401).json({ error: 'Modification non autorisée !' });
+        res.status(401).json({ message: 'Modification non autorisée !' });
       }
       else {
         if(req.file) {
@@ -128,7 +128,7 @@ exports.updateSauce = (req, res) => {
           .then(sauce =>
             res.status(200).json({ message: 'La sauce a été notée !' })
           )
-          .catch(error => res.status(400).json({error: error.message}));
+          .catch(error => res.status(400).json({message: error.message}));
       };   
   })
 };
@@ -163,10 +163,10 @@ exports.likeSauce = (req, res) => {
         //mettre à jour la base de donées 
         Sauce.updateOne({ _id: req.params.id }, sauce)
           .then(sauce => res.status(200).json({ message: 'Sauce like/dislike mis à jour !' }))
-          .catch(error => res.status(400).json({ error: error.message }));
+          .catch(error => res.status(400).json({ message: error.message }));
       }
       catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(400).json({ message: error.message });
       }
     })      
 };

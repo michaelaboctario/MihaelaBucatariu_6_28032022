@@ -38,7 +38,7 @@ const errorHandler = (error) => {
     }
   };
   
-const port = normalizePort(process.env.Port || "3000");
+const port = normalizePort(process.env.PORT || "3000");
 app.set('port', port);
 
 // createServer create node server app
