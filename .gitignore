@@ -45,6 +45,9 @@ Thumbs.db
 /node_modules
 backend/images
 backend/dist
+backend/controllers/dist
+backend/middleware/dist
+backend/routes/dist
 frontend/node_modules
 backend/node_modules
 .env
